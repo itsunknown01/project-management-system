@@ -25,11 +25,6 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
-app.get("/", (req, res) => {
-  console.log(req.session);
-
-  res.send("Hello Session Tut");
-});
 
 ViteExpress.listen(app, 3000, () =>
   console.log("Server is listening on port 3000...")
