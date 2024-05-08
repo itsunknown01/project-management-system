@@ -1,4 +1,12 @@
-import React, { useTransition } from "react";
+import { register } from "@/helpers/auth-action";
+import { RegisterSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import * as z from "zod";
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -7,14 +15,10 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { RegisterSchema } from "@/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
   const [loading, startTransition] = useTransition();
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -25,7 +29,18 @@ const RegisterForm = () => {
     },
   });
 
-  const handleSubmit = () => {};
+  const handleSubmit = async (values: z.infer<typeof RegisterSchema>) => {
+    startTransition(() => {
+      register(values).then((data) => {
+        if (data.error) {
+          toast.error(data.error as string);
+        } else {
+          toast.success(data.success as string);
+          navigate("/login");
+        }
+      });
+    });
+  };
 
   return (
     <Form {...form}>

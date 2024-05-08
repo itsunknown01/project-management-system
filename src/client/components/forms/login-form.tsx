@@ -1,8 +1,13 @@
-import React, { useTransition } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { login } from "@/helpers/auth-action";
+import { LoginSchema } from "@/schemas";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -11,11 +16,10 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { LoginSchema } from "@/schemas";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [loading, startTransition] = useTransition();
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -25,13 +29,22 @@ const LoginForm = () => {
     },
   });
 
-  const handleSubmit = () => {
-
+  const LoginSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    startTransition(() => {
+      login(values).then((data) => {
+        if (data.error) {
+          toast.error(data.error as string);
+        } else {
+          toast.success(data.success as string);
+          navigate("/");
+        }
+      });
+    })
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(() => {})} className="space-y-6">
+      <form onSubmit={form.handleSubmit(LoginSubmit)} className="space-y-6">
         <div className="space-y-4">
           <FormField
             name="email"
