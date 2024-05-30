@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 
 import { getUserByEmail } from "../services/auth.js";
 import { db } from "../services/db.js";
+import dotenv from "dotenv"
+dotenv.config();
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -45,9 +47,10 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     const user = await getUserByEmail(email);
+
     if (!user || !user.password) {
       return res.status(401).json({
-        success: true,
+        success: false,
         message: "Unauthorised",
       });
     }
@@ -55,19 +58,27 @@ export const login = async (req: Request, res: Response) => {
     const passwordMatcher = await bcrypt.compare(password, user.password);
 
     if (passwordMatcher) {
-      const token = jwt.sign({ email }, process.env.JWT_SECRET as string, {
-        expiresIn: 1,
+      const token = jwt.sign({ user }, process.env.JWT_SECRET as string, {
+        expiresIn: "1h",
       });
 
       req.session.token = token;
 
       let userData = {
+        userId: user.id,
         name: user.name,
         email: user.email,
         accessToken: token,
       };
 
-      return res.status(200).json({ userData });
+      req.session.user = user;
+
+      return res.status(200).json({
+        success: true,
+        message: "Logged In Successfully",
+        userData,
+        accessToken: token,
+      });
     } else {
       return res.status(401).json({
         message: "Unauthorised",

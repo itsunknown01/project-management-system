@@ -1,5 +1,5 @@
 import { register } from "@/helpers/auth-action";
-import { RegisterSchema } from "@/schemas";
+import { RegisterSchema } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";

@@ -2,12 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
-import { login } from "@/helpers/auth-action";
-import { LoginSchema } from "@/schemas";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../ui/button";
+
+import { login } from "@/helpers/auth-action";
+import { LoginSchema } from "@/schemas/auth";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,12 +15,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useAuthStore } from "@/hooks/auth/use-auth";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const [loading, startTransition] = useTransition();
+  const { login, user } = useAuthStore();
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -31,16 +33,9 @@ const LoginForm = () => {
 
   const LoginSubmit = async (values: z.infer<typeof LoginSchema>) => {
     startTransition(() => {
-      login(values).then((data) => {
-        if (data.error) {
-          toast.error(data.error as string);
-        } else {
-          toast.success(data.success as string);
-          navigate("/");
-        }
-      });
-    })
-  }
+      login(values.email, values.password).then(() => navigate("/"));
+    });
+  };
 
   return (
     <Form {...form}>

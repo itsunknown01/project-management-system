@@ -6,10 +6,12 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
 import { Toaster } from "react-hot-toast";
+import ModalProvider from "./components/providers/modal-provider";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
+      <ModalProvider />
       <Toaster />
       <App />
     </BrowserRouter>

@@ -1,11 +1,16 @@
-import React from 'react'
+import React, { useEffect } from "react";
+import { useModalStore } from "@/hooks/modal/use-modal-store";
 
 const Home = () => {
-  return (
-    <div>
-      Home
-    </div>
-  )
-}
+  const { isOpen, onOpen } = useModalStore();
 
-export default Home
+  useEffect(() => {
+    if (!isOpen) {
+      onOpen();
+    }
+  }, [isOpen, onOpen]);
+
+  return null;
+};
+
+export default Home;
